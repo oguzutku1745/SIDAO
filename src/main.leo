@@ -80,8 +80,6 @@ program dao_test.aleo {
     mapping round_project_ids: u64 => RoundProjectIds;
     // To fetch the project information
     mapping project_info: field => Project;
-    // To fetch the project id's
-    mapping active_project_info: u16 => field;
     // To check the epoch situation
     mapping is_round_active: u32 => bool;
     // To identify the shares of the investor
@@ -241,9 +239,6 @@ program dao_test.aleo {
         let round_details:Round = Mapping::get(round_info,round_constant);
         let project_index:u16 = round_details.active_project_count + 1u16;
 
-        // Set the project index to project field
-        Mapping::set(active_project_info, project_index, project_id);
-
         let project_submission:Project = Project {
             id: project_id,
             project_owner: creator_address,
@@ -278,7 +273,6 @@ program dao_test.aleo {
     }
 
     // INCREASE THE STAGE OF THE PROJECT FOR THE NEXT ROUNDS
-
     async transition upgrade_stage(public project_id:field, public project_owner:address) -> Future {
 
         return upgrade_stage_finalize(project_id, project_owner);
@@ -292,7 +286,28 @@ program dao_test.aleo {
 
         let round_details:Round = Mapping::get(round_info,round_constant);
         let project_index:u16 = round_details.active_project_count + 1u16;
-        Mapping::set(active_project_info, project_index, project_id);
+
+        let round_projects: RoundProjectIds = Mapping::get(round_project_ids, round_details.total_rounds as u64);
+
+        let submit_round_id:RoundProjectIds = RoundProjectIds {
+            project1: project_index == 1u16 ? project_id : round_projects.project1,
+            project2: project_index == 2u16 ? project_id : round_projects.project2,
+            project3: project_index == 3u16 ? project_id : round_projects.project3,
+            project4: project_index == 4u16 ? project_id : round_projects.project4,
+            project5: project_index == 5u16 ? project_id : round_projects.project5,
+            project6: project_index == 6u16 ? project_id : round_projects.project6,
+            project7: project_index == 7u16 ? project_id : round_projects.project7,
+            project8: project_index == 8u16 ? project_id : round_projects.project8,
+            project9: project_index == 9u16 ? project_id : round_projects.project9,
+            project10: project_index == 10u16 ? project_id : round_projects.project10,
+            project11: project_index == 11u16 ? project_id : round_projects.project11,
+            project12: project_index == 12u16 ? project_id : round_projects.project12,
+            project13: project_index == 13u16 ? project_id : round_projects.project13,
+            project14: project_index == 14u16 ? project_id : round_projects.project14,
+            project15: project_index == 15u16 ? project_id : round_projects.project15,
+        };
+
+        Mapping::set(round_project_ids, round_details.total_rounds as u64, submit_round_id);
     }
 
     // FUND A PROJECT
